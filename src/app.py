@@ -1,20 +1,23 @@
-from flask import Flask
+from flask import Flask,request,jsonify
+import pyodbc
 
+import json
 app = Flask(__name__)
-@app.route('/')
 
-#python 
+server = "Jorgeserver.database.windows.net"
+database = 'DPL' 
+username = 'Jmmc' 
+password = 'ChaosSoldier01'  
+cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+
+
+
+
+@app.route('/home')
 #python .\src\app.py
-
 def RespuestaPost():
-    import pyodbc
     import pandas as pd
-    import json
-    server = "Jorgeserver.database.windows.net"
-    database = 'DPL' 
-    username = 'Jmmc' 
-    password = 'ChaosSoldier01'  
-    cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+
     cursor = cnxn.cursor()
     queryIEES = "SELECT * FROM [citas].[PRTAL_Transportistas]"
     queryRegistroPenal = "SELECT * FROM [citas].[RegistroPenal]"
@@ -33,6 +36,20 @@ def RespuestaPost():
     
 
     return pd
+
+#--------Prueba post--------------------
+@app.route('/seguridad', methods=['POST'])
+def registrar_curso():
+    try:
+        cursor = cnxn.cursor()
+        sql="""insert into citas.FormularioSeguridad_Resultados (Cedula,Fecha,Estado,Puntuacion)
+                values ('{0}','{1}','{2}',{3})""".format(request.json['cedula'],request.json['Fecha'],request.json['Estado'],request.json['Puntuacion'])
+        cursor.execute()
+        cnxn.commit()
+        return jsonify({'mensaje':"Curso registrado"})
+    except Exception as ex:
+        return jsonify({'mensaje':"Error"})
+
 
 
 if __name__ == "__main__":
