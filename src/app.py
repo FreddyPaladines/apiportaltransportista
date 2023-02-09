@@ -13,7 +13,7 @@ cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';
 
 
 
-@app.route('/home')
+@app.route('/')
 #python .\src\app.py
 def RespuestaPost():
     import pandas as pd
